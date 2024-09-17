@@ -1,16 +1,14 @@
 import * as z from 'zod'
-
 import { AnimatePresence, motion } from 'framer-motion'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import React, { useState } from 'react'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import RecommendationCard from './RecommendationCard'
 import { useForm } from 'react-hook-form'
-import { useMusic } from '../queries/useMusic'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { getMusicRecommendation } from '../services/Music'
 
 const formSchema = z.object({
 	genre: z.string().min(3, { message: 'Tür en az 3 karakter olmalıdır.' }),
@@ -19,6 +17,40 @@ const formSchema = z.object({
 })
 
 type FormValues = z.infer<typeof formSchema>
+
+interface Recommendation {
+	songName: string
+	artist: string
+	album?: string
+	link: string
+}
+
+function useMusic() {
+	const [recommendation, setRecommendation] = useState<Recommendation | null>(null)
+	const [isLoading, setIsLoading] = useState<boolean>(false)
+	const [error, setError] = useState<string | null>(null)
+
+	const getRecommendation = async (formData: FormValues) => {
+		setIsLoading(true)
+		setError(null)
+		try {
+			const result = await getMusicRecommendation(formData.genre, formData.mood, formData.language)
+			const [songName, artist, album] = result.split(' - ')
+			setRecommendation({
+				songName,
+				artist,
+				album,
+				link: `https://www.youtube.com/results?search_query=${encodeURIComponent(`${songName} ${artist}`)}`
+			})
+		} catch (err) {
+			setError('Müzik önerisi alınamadı. Lütfen tekrar deneyin.')
+		} finally {
+			setIsLoading(false)
+		}
+	}
+
+	return { recommendation, isLoading, error, getRecommendation }
+}
 
 const LoadingUI = () => {
 	const emojis = ['🎵', '🎶', '🎸', '🥁', '🎹', '🎷', '🎺', '🎻']
