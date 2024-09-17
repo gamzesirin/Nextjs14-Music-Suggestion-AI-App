@@ -33,9 +33,9 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({ recommendation 
 						href={link}
 						target="_blank"
 						rel="noopener noreferrer"
-						className="block mt-4 bg-white text-purple-600 px-4 py-2 rounded-full text-center font-semibold hover:bg-opacity-90 transition-colors duration-300"
+						className="block mt-4  py-2 rounded-full font-semibold hover:bg-opacity-90 transition-colors duration-300 text-underline"
 					>
-						Şarkıyı Dinle
+						Şarkıyı Dinlemek İçin Tıkla
 					</a>
 				</CardContent>
 			</Card>
